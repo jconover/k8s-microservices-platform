@@ -1,0 +1,45 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [frontend, user-service, product-service, order-service, notification-service]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './applications/${{ matrix.service }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  kubesec-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run kubesec scan
+      run: |
+        for file in k8s-manifests/**/*.yaml; do
+          echo "Scanning $file"
+          docker run -v $(pwd):/app kubesec/kubesec:latest scan /app/$file
+        done

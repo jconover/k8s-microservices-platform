@@ -1,0 +1,214 @@
+global:
+  storageClass: fast-nvme
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Frontend Configuration
+frontend:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: yourusername/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+    loadBalancerIP: 192.168.68.210
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: frontend.k8s.local
+        paths:
+          - path: /
+            pathType: Prefix
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+# User Service Configuration
+userService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: yourusername/user-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Product Service Configuration
+productService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: yourusername/product-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Order Service Configuration
+orderService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: yourusername/order-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Notification Service Configuration
+notificationService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: yourusername/notification-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5001
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# API Gateway Configuration
+apiGateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: kong
+    tag: 3.5-alpine
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 8080
+    adminPort: 8001
+    loadBalancerIP: 192.168.68.211
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "SuperSecurePassword123!"
+    username: "admin"
+    password: "SuperSecurePassword123!"
+    database: "microservices"
+  primary:
+    persistence:
+      enabled: true
+      storageClass: "fast-nvme"
+      size: 50Gi
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+      limits:
+        memory: "4Gi"
+        cpu: "2"
+    extendedConfiguration: |
+      shared_buffers = 2GB
+      effective_cache_size = 6GB
+      maintenance_work_mem = 512MB
+      work_mem = 32MB
+      max_connections = 200
+
+# Redis Configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      storageClass: "fast-nvme"
+      size: 10Gi
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+# RabbitMQ Configuration
+rabbitmq:
+  enabled: true
+  auth:
+    username: admin
+    password: admin123
+  persistence:
+    enabled: true
+    storageClass: "fast-nvme"
+    size: 5Gi
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 192.168.68.205
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    retention: 30d
+    storage: 50Gi
+  grafana:
+    enabled: true
+    adminPassword: admin123
+    persistence:
+      enabled: true
+      size: 10Gi
