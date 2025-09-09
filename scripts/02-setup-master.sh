@@ -26,14 +26,10 @@ if [[ "$CURRENT_IP" != "$CONTROL_PLANE_IP" ]]; then
     exit 1
 fi
 
-# Detect the installed kubeadm version and use appropriate Kubernetes version
+# Detect the installed kubeadm version
 echo -e "${GREEN}Detecting kubeadm version...${NC}"
 KUBEADM_VERSION=$(kubeadm version -o short)
 echo "Installed kubeadm version: $KUBEADM_VERSION"
-
-# Extract major.minor version (e.g., v1.34.0 -> 1.34)
-KUBE_VERSION=$(echo $KUBEADM_VERSION | sed 's/v\([0-9]*\.[0-9]*\).*/\1/')
-echo "Will use Kubernetes version: v${KUBE_VERSION}"
 
 # Check if cluster is already initialized
 if [ -f /etc/kubernetes/admin.conf ]; then
@@ -44,76 +40,13 @@ if [ -f /etc/kubernetes/admin.conf ]; then
     exit 1
 fi
 
-echo -e "${GREEN}Creating kubeadm configuration...${NC}"
-# Using v1beta4 API version for newer kubeadm
-cat <<EOF | sudo tee /tmp/kubeadm-config.yaml
-apiVersion: kubeadm.k8s.io/v1beta4
-kind: InitConfiguration
-localAPIEndpoint:
-  advertiseAddress: ${CONTROL_PLANE_IP}
-  bindPort: 6443
-nodeRegistration:
-  criSocket: unix:///var/run/containerd/containerd.sock
-  imagePullPolicy: IfNotPresent
-  kubeletExtraArgs:
-    node-ip: ${CONTROL_PLANE_IP}
----
-apiVersion: kubeadm.k8s.io/v1beta4
-kind: ClusterConfiguration
-kubernetesVersion: ${KUBEADM_VERSION}
-clusterName: ${CLUSTER_NAME}
-controlPlaneEndpoint: "${CONTROL_PLANE_IP}:6443"
-networking:
-  serviceSubnet: ${SERVICE_CIDR}
-  podSubnet: ${POD_NETWORK_CIDR}
-  dnsDomain: cluster.local
-apiServer:
-  extraArgs:
-    advertise-address: ${CONTROL_PLANE_IP}
-controllerManager:
-  extraArgs:
-    bind-address: 0.0.0.0
-    node-cidr-mask-size: "24"
-scheduler:
-  extraArgs:
-    bind-address: 0.0.0.0
-etcd:
-  local:
-    dataDir: "/var/lib/etcd"
----
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-cgroupDriver: systemd
-containerRuntimeEndpoint: unix:///var/run/containerd/containerd.sock
-serverTLSBootstrap: true
-imageGCHighThresholdPercent: 85
-imageGCLowThresholdPercent: 80
-evictionHard:
-  memory.available: "2Gi"
-  nodefs.available: "10%"
-  imagefs.available: "15%"
-systemReserved:
-  cpu: "1"
-  memory: "2Gi"
-kubeReserved:
-  cpu: "1"
-  memory: "2Gi"
----
-apiVersion: kubeproxy.config.k8s.io/v1alpha1
-kind: KubeProxyConfiguration
-clusterCIDR: ${POD_NETWORK_CIDR}
-mode: "ipvs"
-ipvs:
-  strictARP: true
-EOF
-
-# Show the config for verification
-echo -e "${YELLOW}Configuration to be used:${NC}"
-grep "kubernetesVersion" /tmp/kubeadm-config.yaml
-
-# Initialize the cluster
+# Initialize using simpler command-line approach (more reliable)
 echo -e "${GREEN}Initializing Kubernetes cluster...${NC}"
-sudo kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs
+sudo kubeadm init \
+  --apiserver-advertise-address=${CONTROL_PLANE_IP} \
+  --pod-network-cidr=${POD_NETWORK_CIDR} \
+  --service-cidr=${SERVICE_CIDR} \
+  --upload-certs
 
 # Setup kubectl for the current user
 echo -e "${GREEN}Configuring kubectl...${NC}"
@@ -208,7 +141,7 @@ echo -e "${YELLOW}Cluster Information:${NC}"
 kubectl cluster-info
 echo ""
 echo -e "${YELLOW}Kubernetes Version:${NC}"
-kubectl version --short
+kubectl version -o yaml
 echo ""
 echo -e "${YELLOW}Join Command for Worker Nodes:${NC}"
 echo -e "${RED}Run this command with sudo on k8s-worker-01 and k8s-worker-02:${NC}"
