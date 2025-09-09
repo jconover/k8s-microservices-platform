@@ -73,9 +73,6 @@ spec:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
           subPath: postgres
-        - name: postgres-config
-          mountPath: /etc/postgresql/postgresql.conf
-          subPath: postgresql.conf
         resources:
           requests:
             memory: "2Gi"
