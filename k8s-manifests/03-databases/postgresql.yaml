@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,14 +7,6 @@ metadata:
 data:
   POSTGRES_DB: microservices
   POSTGRES_USER: admin
-  postgresql.conf: |
-    shared_buffers = 2GB
-    effective_cache_size = 6GB
-    maintenance_work_mem = 512MB
-    work_mem = 32MB
-    max_connections = 200
-    max_parallel_workers_per_gather = 2
-    max_parallel_workers = 4
 ---
 apiVersion: v1
 kind: Secret
@@ -54,9 +47,6 @@ spec:
     metadata:
       labels:
         app: postgresql
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9187"
     spec:
       containers:
       - name: postgresql
@@ -75,11 +65,11 @@ spec:
           subPath: postgres
         resources:
           requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
             memory: "2Gi"
             cpu: "1"
-          limits:
-            memory: "4Gi"
-            cpu: "2"
         livenessProbe:
           exec:
             command:
@@ -104,4 +94,4 @@ spec:
       storageClassName: "fast-nvme"
       resources:
         requests:
-          storage: 50Gi
+          storage: 20Gi
