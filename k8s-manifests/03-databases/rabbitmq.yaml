@@ -3,16 +3,11 @@ kind: Service
 metadata:
   name: rabbitmq
   namespace: database
-  labels:
-    app: rabbitmq
 spec:
-  type: ClusterIP
   ports:
   - port: 5672
-    targetPort: 5672
     name: amqp
   - port: 15672
-    targetPort: 15672
     name: management
   selector:
     app: rabbitmq
@@ -49,7 +44,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq
-        image: rabbitmq:3.12-management-alpine
+        image: rabbitmq:4.1-management-alpine
         ports:
         - containerPort: 5672
           name: amqp
@@ -68,36 +63,15 @@ spec:
             memory: "1Gi"
             cpu: "500m"
         livenessProbe:
-          exec:
-            command:
-            - rabbitmq-diagnostics
-            - ping
+          tcpSocket:
+            port: 5672
           initialDelaySeconds: 60
           periodSeconds: 30
+          timeoutSeconds: 10
         readinessProbe:
-          exec:
-            command:
-            - rabbitmq-diagnostics
-            - check_port_connectivity
-          initialDelaySeconds: 20
+          httpGet:
+            path: /
+            port: 15672
+          initialDelaySeconds: 30
           periodSeconds: 10
-        volumeMounts:
-        - name: rabbitmq-data
-          mountPath: /var/lib/rabbitmq
-      volumes:
-      - name: rabbitmq-data
-        persistentVolumeClaim:
-          claimName: rabbitmq-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: rabbitmq-pvc
-  namespace: database
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: fast-nvme
-  resources:
-    requests:
-      storage: 5Gi
+          timeoutSeconds: 5
