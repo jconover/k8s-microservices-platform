@@ -1,3 +1,57 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+  namespace: microservices
+data:
+  default.conf: |
+    upstream user-service {
+        server user-service:3000;
+    }
+    upstream product-service {
+        server product-service:5000;
+    }
+    upstream order-service {
+        server order-service:8080;
+    }
+    
+    server {
+        listen 80;
+        
+        location /health {
+            access_log off;
+            return 200 'healthy\n';
+            add_header Content-Type text/plain;
+        }
+        
+        location /api/users {
+            proxy_pass http://user-service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        
+        location /api/products {
+            proxy_pass http://product-service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        
+        location /api/orders {
+            proxy_pass http://order-service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        
+        location / {
+            return 200 'API Gateway is running\n';
+            add_header Content-Type text/plain;
+        }
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,6 +59,7 @@ metadata:
   namespace: microservices
   labels:
     app: api-gateway
+    tier: gateway
 spec:
   replicas: 2
   selector:
@@ -14,44 +69,28 @@ spec:
     metadata:
       labels:
         app: api-gateway
+        tier: gateway
     spec:
       containers:
       - name: api-gateway
-        image: kong:3.5-alpine
+        image: nginx:alpine
         ports:
-        - containerPort: 8000
-          name: proxy
-        - containerPort: 8001
-          name: admin
-        env:
-        - name: KONG_DATABASE
-          value: "off"
-        - name: KONG_DECLARATIVE_CONFIG
-          value: "/kong/declarative/kong.yml"
-        - name: KONG_PROXY_ACCESS_LOG
-          value: "/dev/stdout"
-        - name: KONG_ADMIN_ACCESS_LOG
-          value: "/dev/stdout"
-        - name: KONG_PROXY_ERROR_LOG
-          value: "/dev/stderr"
-        - name: KONG_ADMIN_ERROR_LOG
-          value: "/dev/stderr"
-        - name: KONG_ADMIN_LISTEN
-          value: "0.0.0.0:8001"
+        - containerPort: 80
+          name: http
         volumeMounts:
-        - name: kong-config
-          mountPath: /kong/declarative/
+        - name: config
+          mountPath: /etc/nginx/conf.d
         resources:
           requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
             memory: "256Mi"
             cpu: "200m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
       volumes:
-      - name: kong-config
+      - name: config
         configMap:
-          name: kong-config
+          name: api-gateway-config
 ---
 apiVersion: v1
 kind: Service
@@ -65,44 +104,7 @@ spec:
   loadBalancerIP: 192.168.68.211
   ports:
   - port: 8080
-    targetPort: 8000
-    name: proxy
-  - port: 8001
-    targetPort: 8001
-    name: admin
+    targetPort: 80
+    protocol: TCP
   selector:
     app: api-gateway
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kong-config
-  namespace: microservices
-data:
-  kong.yml: |
-    _format_version: "3.0"
-    services:
-    - name: user-service
-      url: http://user-service.microservices:3000
-      routes:
-      - name: user-route
-        paths:
-        - /api/users
-    - name: product-service
-      url: http://product-service.microservices:5000
-      routes:
-      - name: product-route
-        paths:
-        - /api/products
-    - name: order-service
-      url: http://order-service.microservices:8080
-      routes:
-      - name: order-route
-        paths:
-        - /api/orders
-    - name: notification-service
-      url: http://notification-service.microservices:5001
-      routes:
-      - name: notification-route
-        paths:
-        - /api/notifications

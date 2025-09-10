@@ -1,208 +1,295 @@
-<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="1200" height="800" fill="#f8f9fa"/>
+  <rect width="1400" height="900" fill="#f8f9fa"/>
   
-  <!-- Title -->
-  <text x="600" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#2c3e50">
-    Beelink Kubernetes Cluster Architecture
+  <!-- Title and Subtitle -->
+  <text x="700" y="30" text-anchor="middle" font-size="26" font-weight="bold" fill="#2c3e50">
+    Kubernetes Microservices Platform - Production Architecture
   </text>
-  <text x="600" y="55" text-anchor="middle" font-size="14" fill="#7f8c8d">
-    Network: 192.168.68.0/24 | Pod CIDR: 10.244.0.0/16 | Service CIDR: 10.96.0.0/12
+  <text x="700" y="55" text-anchor="middle" font-size="14" fill="#7f8c8d">
+    3-Node Beelink SER5 Max Cluster | 96GB RAM | 48 Threads | Ubuntu 24.04
   </text>
   
-  <!-- Cluster Border -->
-  <rect x="50" y="70" width="1100" height="710" fill="none" stroke="#3498db" stroke-width="2" stroke-dasharray="5,5" rx="10"/>
-  <text x="70" y="95" font-size="14" font-weight="bold" fill="#3498db">3-Node Beelink SER5 Max Cluster (96GB RAM, 48 Threads Total)</text>
+  <!-- Network Info Bar -->
+  <rect x="50" y="70" width="1300" height="30" fill="#e8f4f8" stroke="#3498db" stroke-width="1" rx="5"/>
+  <text x="700" y="90" text-anchor="middle" font-size="12" fill="#2c3e50">
+    Cluster: 192.168.68.0/24 | Pods: 10.244.0.0/16 | Services: 10.96.0.0/12 | LoadBalancer Pool: 192.168.68.200-250
+  </text>
   
-  <!-- Master Node -->
-  <g id="master-node">
-    <rect x="80" y="110" width="340" height="650" fill="#e8f4f8" stroke="#2980b9" stroke-width="2" rx="5"/>
-    <rect x="90" y="120" width="320" height="35" fill="#2980b9" rx="3"/>
-    <text x="250" y="143" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-master-01 (192.168.68.86)</text>
-    <text x="250" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">Ryzen 7 6800U | 32GB RAM | Control Plane</text>
+  <!-- Main Cluster Border -->
+  <rect x="50" y="110" width="1300" height="750" fill="none" stroke="#3498db" stroke-width="2" stroke-dasharray="5,5" rx="10"/>
+  
+  <!-- Control Plane Node -->
+  <g id="control-plane">
+    <rect x="70" y="130" width="400" height="350" fill="#e8f4f8" stroke="#2980b9" stroke-width="2" rx="5"/>
+    <rect x="80" y="140" width="380" height="35" fill="#2980b9" rx="3"/>
+    <text x="270" y="163" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-master-01 (192.168.68.86)</text>
     
     <!-- Control Plane Components -->
-    <rect x="100" y="190" width="140" height="50" fill="#34495e" stroke="#2c3e50" stroke-width="1" rx="3"/>
-    <text x="170" y="210" text-anchor="middle" font-size="11" font-weight="bold" fill="white">API Server</text>
-    <text x="170" y="228" text-anchor="middle" font-size="9" fill="white">:6443</text>
+    <text x="270" y="195" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Control Plane Components</text>
     
-    <rect x="260" y="190" width="140" height="50" fill="#34495e" stroke="#2c3e50" stroke-width="1" rx="3"/>
-    <text x="330" y="210" text-anchor="middle" font-size="11" font-weight="bold" fill="white">etcd</text>
-    <text x="330" y="228" text-anchor="middle" font-size="9" fill="white">Key-Value Store</text>
+    <g id="cp-components">
+      <rect x="90" y="210" width="80" height="40" fill="#34495e" stroke="#2c3e50" rx="3"/>
+      <text x="130" y="235" text-anchor="middle" font-size="10" fill="white">API Server</text>
+      
+      <rect x="180" y="210" width="80" height="40" fill="#34495e" stroke="#2c3e50" rx="3"/>
+      <text x="220" y="235" text-anchor="middle" font-size="10" fill="white">etcd</text>
+      
+      <rect x="270" y="210" width="80" height="40" fill="#34495e" stroke="#2c3e50" rx="3"/>
+      <text x="310" y="235" text-anchor="middle" font-size="10" fill="white">Scheduler</text>
+      
+      <rect x="360" y="210" width="90" height="40" fill="#34495e" stroke="#2c3e50" rx="3"/>
+      <text x="405" y="235" text-anchor="middle" font-size="10" fill="white">Controller Mgr</text>
+    </g>
     
-    <rect x="100" y="250" width="140" height="50" fill="#34495e" stroke="#2c3e50" stroke-width="1" rx="3"/>
-    <text x="170" y="270" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Scheduler</text>
-    <text x="170" y="288" text-anchor="middle" font-size="9" fill="white">Pod Placement</text>
+    <!-- CNI -->
+    <rect x="90" y="260" width="360" height="40" fill="#8e44ad" stroke="#6c3483" rx="3"/>
+    <text x="270" y="285" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Cilium CNI (eBPF-based Networking)</text>
     
-    <rect x="260" y="250" width="140" height="50" fill="#34495e" stroke="#2c3e50" stroke-width="1" rx="3"/>
-    <text x="330" y="270" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Controller Manager</text>
-    <text x="330" y="288" text-anchor="middle" font-size="9" fill="white">State Management</text>
+    <!-- CoreDNS -->
+    <rect x="90" y="310" width="170" height="40" fill="#3498db" stroke="#2980b9" rx="3"/>
+    <text x="175" y="335" text-anchor="middle" font-size="11" fill="white">CoreDNS</text>
     
-    <!-- Monitoring on Master -->
-    <text x="250" y="325" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Monitoring Stack</text>
+    <!-- Metrics Server -->
+    <rect x="280" y="310" width="170" height="40" fill="#3498db" stroke="#2980b9" rx="3"/>
+    <text x="365" y="335" text-anchor="middle" font-size="11" fill="white">Metrics Server</text>
     
-    <rect x="100" y="340" width="140" height="50" fill="#ff9f1a" stroke="#e67700" stroke-width="1" rx="3"/>
-    <text x="170" y="360" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Prometheus</text>
-    <text x="170" y="378" text-anchor="middle" font-size="9" fill="white">192.168.68.201</text>
-    
-    <rect x="260" y="340" width="140" height="50" fill="#f46a54" stroke="#e94b35" stroke-width="1" rx="3"/>
-    <text x="330" y="360" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Grafana</text>
-    <text x="330" y="378" text-anchor="middle" font-size="9" fill="white">192.168.68.202</text>
-    
-    <rect x="100" y="400" width="140" height="50" fill="#ff6b6b" stroke="#c92a2a" stroke-width="1" rx="3"/>
-    <text x="170" y="420" text-anchor="middle" font-size="11" font-weight="bold" fill="white">AlertManager</text>
-    <text x="170" y="438" text-anchor="middle" font-size="9" fill="white">192.168.68.203</text>
-    
-    <rect x="260" y="400" width="140" height="50" fill="#00b4d8" stroke="#0077b6" stroke-width="1" rx="3"/>
-    <text x="330" y="420" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Loki</text>
-    <text x="330" y="438" text-anchor="middle" font-size="9" fill="white">Log Aggregation</text>
-    
-    <!-- GitOps -->
-    <text x="250" y="475" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">GitOps & Ingress</text>
-    
-    <rect x="100" y="490" width="140" height="50" fill="#00d4aa" stroke="#00a884" stroke-width="1" rx="3"/>
-    <text x="170" y="510" text-anchor="middle" font-size="11" font-weight="bold" fill="white">ArgoCD</text>
-    <text x="170" y="528" text-anchor="middle" font-size="9" fill="white">192.168.68.204</text>
-    
-    <rect x="260" y="490" width="140" height="50" fill="#4ecdc4" stroke="#087f5b" stroke-width="1" rx="3"/>
-    <text x="330" y="510" text-anchor="middle" font-size="11" font-weight="bold" fill="white">NGINX Ingress</text>
-    <text x="330" y="528" text-anchor="middle" font-size="9" fill="white">192.168.68.200</text>
-    
-    <!-- Cilium CNI -->
-    <rect x="100" y="550" width="300" height="50" fill="#8e44ad" stroke="#6c3483" stroke-width="1" rx="3"/>
-    <text x="250" y="570" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Cilium CNI (eBPF)</text>
-    <text x="250" y="588" text-anchor="middle" font-size="9" fill="white">Pod Network: 10.244.0.0/16</text>
+    <!-- Node Resources -->
+    <rect x="90" y="360" width="360" height="100" fill="#ecf0f1" stroke="#95a5a6" rx="3"/>
+    <text x="270" y="380" text-anchor="middle" font-size="11" font-weight="bold" fill="#2c3e50">Node Resources</text>
+    <text x="120" y="400" font-size="10" fill="#2c3e50">CPU: Ryzen 7 6800U (8C/16T)</text>
+    <text x="120" y="415" font-size="10" fill="#2c3e50">RAM: 32GB LPDDR5</text>
+    <text x="120" y="430" font-size="10" fill="#2c3e50">Storage: NVMe SSD</text>
+    <text x="120" y="445" font-size="10" fill="#2c3e50">Network: 2.5GbE</text>
   </g>
   
   <!-- Worker Node 1 -->
-  <g id="worker1">
-    <rect x="440" y="110" width="340" height="650" fill="#f0f8ff" stroke="#2980b9" stroke-width="2" rx="5"/>
-    <rect x="450" y="120" width="320" height="35" fill="#2980b9" rx="3"/>
-    <text x="610" y="143" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-worker-01 (192.168.68.88)</text>
-    <text x="610" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">Ryzen 7 6800U | 32GB RAM | Worker Node</text>
-    
-    <!-- Frontend Services -->
-    <text x="610" y="205" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Frontend & API Gateway</text>
-    
-    <rect x="460" y="220" width="140" height="50" fill="#ff6b6b" stroke="#c92a2a" stroke-width="1" rx="3"/>
-    <text x="530" y="240" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Frontend</text>
-    <text x="530" y="258" text-anchor="middle" font-size="9" fill="white">React (3 replicas)</text>
-    
-    <rect x="620" y="220" width="140" height="50" fill="#4ecdc4" stroke="#087f5b" stroke-width="1" rx="3"/>
-    <text x="690" y="240" text-anchor="middle" font-size="11" font-weight="bold" fill="white">API Gateway</text>
-    <text x="690" y="258" text-anchor="middle" font-size="9" fill="white">Traefik/Kong</text>
+  <g id="worker-1">
+    <rect x="490" y="130" width="400" height="350" fill="#f0f8ff" stroke="#2980b9" stroke-width="2" rx="5"/>
+    <rect x="500" y="140" width="380" height="35" fill="#2980b9" rx="3"/>
+    <text x="690" y="163" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-worker-01 (192.168.68.88)</text>
     
     <!-- Microservices -->
-    <text x="610" y="295" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Microservices</text>
+    <text x="690" y="195" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Application Workloads</text>
     
-    <rect x="460" y="310" width="140" height="50" fill="#845ec2" stroke="#5f3dc4" stroke-width="1" rx="3"/>
-    <text x="530" y="330" text-anchor="middle" font-size="11" font-weight="bold" fill="white">User Service</text>
-    <text x="530" y="348" text-anchor="middle" font-size="9" fill="white">Node.js</text>
-    
-    <rect x="620" y="310" width="140" height="50" fill="#845ec2" stroke="#5f3dc4" stroke-width="1" rx="3"/>
-    <text x="690" y="330" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Product Service</text>
-    <text x="690" y="348" text-anchor="middle" font-size="9" fill="white">Python</text>
-    
-    <rect x="460" y="370" width="140" height="50" fill="#845ec2" stroke="#5f3dc4" stroke-width="1" rx="3"/>
-    <text x="530" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Order Service</text>
-    <text x="530" y="408" text-anchor="middle" font-size="9" fill="white">Java Spring</text>
-    
-    <rect x="620" y="370" width="140" height="50" fill="#845ec2" stroke="#5f3dc4" stroke-width="1" rx="3"/>
-    <text x="690" y="390" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Notification Svc</text>
-    <text x="690" y="408" text-anchor="middle" font-size="9" fill="white">Python</text>
+    <g id="microservices">
+      <rect x="510" y="210" width="110" height="40" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="565" y="230" text-anchor="middle" font-size="10" fill="white">Frontend</text>
+      <text x="565" y="243" text-anchor="middle" font-size="8" fill="white">nginx (3 pods)</text>
+      
+      <rect x="630" y="210" width="110" height="40" fill="#4ecdc4" stroke="#087f5b" rx="3"/>
+      <text x="685" y="230" text-anchor="middle" font-size="10" fill="white">API Gateway</text>
+      <text x="685" y="243" text-anchor="middle" font-size="8" fill="white">nginx (2 pods)</text>
+      
+      <rect x="750" y="210" width="110" height="40" fill="#845ec2" stroke="#5f3dc4" rx="3"/>
+      <text x="805" y="230" text-anchor="middle" font-size="10" fill="white">User Service</text>
+      <text x="805" y="243" text-anchor="middle" font-size="8" fill="white">httpbin (2 pods)</text>
+    </g>
     
     <!-- Databases -->
-    <text x="610" y="445" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Databases</text>
+    <text x="690" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Databases</text>
     
-    <rect x="460" y="460" width="140" height="50" fill="#336791" stroke="#1e3a5f" stroke-width="1" rx="3"/>
-    <text x="530" y="480" text-anchor="middle" font-size="11" font-weight="bold" fill="white">PostgreSQL</text>
-    <text x="530" y="498" text-anchor="middle" font-size="9" fill="white">StatefulSet</text>
+    <g id="databases">
+      <rect x="510" y="285" width="110" height="40" fill="#336791" stroke="#1e3a5f" rx="3"/>
+      <text x="565" y="305" text-anchor="middle" font-size="10" fill="white">PostgreSQL</text>
+      <text x="565" y="318" text-anchor="middle" font-size="8" fill="white">StatefulSet</text>
+      
+      <rect x="630" y="285" width="110" height="40" fill="#dc382d" stroke="#a41e22" rx="3"/>
+      <text x="685" y="305" text-anchor="middle" font-size="10" fill="white">Redis</text>
+      <text x="685" y="318" text-anchor="middle" font-size="8" fill="white">Cache (1GB)</text>
+      
+      <rect x="750" y="285" width="110" height="40" fill="#ff6600" stroke="#cc5200" rx="3"/>
+      <text x="805" y="305" text-anchor="middle" font-size="10" fill="white">RabbitMQ</text>
+      <text x="805" y="318" text-anchor="middle" font-size="8" fill="white">Message Queue</text>
+    </g>
     
-    <rect x="620" y="460" width="140" height="50" fill="#dc382d" stroke="#a41e22" stroke-width="1" rx="3"/>
-    <text x="690" y="480" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Redis</text>
-    <text x="690" y="498" text-anchor="middle" font-size="9" fill="white">Cache (4GB)</text>
+    <!-- Storage -->
+    <rect x="510" y="335" width="350" height="40" fill="#ffa94d" stroke="#fd7e14" rx="3"/>
+    <text x="685" y="355" text-anchor="middle" font-size="11" fill="white">Longhorn Distributed Storage</text>
+    <text x="685" y="368" text-anchor="middle" font-size="9" fill="white">Dynamic PV Provisioning | 2 Replicas</text>
     
-    <!-- Message Queue -->
-    <rect x="460" y="520" width="300" height="50" fill="#ff6600" stroke="#cc5200" stroke-width="1" rx="3"/>
-    <text x="610" y="540" text-anchor="middle" font-size="11" font-weight="bold" fill="white">RabbitMQ</text>
-    <text x="610" y="558" text-anchor="middle" font-size="9" fill="white">Message Queue</text>
+    <!-- Node Resources -->
+    <rect x="510" y="385" width="350" height="75" fill="#ecf0f1" stroke="#95a5a6" rx="3"/>
+    <text x="685" y="405" text-anchor="middle" font-size="11" font-weight="bold" fill="#2c3e50">Node Utilization</text>
+    <text x="540" y="425" font-size="10" fill="#2c3e50">CPU: ~40% (6.4/16 threads)</text>
+    <text x="540" y="440" font-size="10" fill="#2c3e50">Memory: ~35% (11.2/32GB)</text>
+    <text x="700" y="425" font-size="10" fill="#2c3e50">Pods: 12 Running</text>
+    <text x="700" y="440" font-size="10" fill="#2c3e50">Storage: 50GB Used</text>
   </g>
   
   <!-- Worker Node 2 -->
-  <g id="worker2">
-    <rect x="800" y="110" width="340" height="650" fill="#f0f8ff" stroke="#2980b9" stroke-width="2" rx="5"/>
-    <rect x="810" y="120" width="320" height="35" fill="#2980b9" rx="3"/>
-    <text x="970" y="143" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-worker-02 (192.168.68.83)</text>
-    <text x="970" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">Ryzen 7 6800U | 32GB RAM | Worker Node</text>
+  <g id="worker-2">
+    <rect x="910" y="130" width="420" height="350" fill="#f0f8ff" stroke="#2980b9" stroke-width="2" rx="5"/>
+    <rect x="920" y="140" width="400" height="35" fill="#2980b9" rx="3"/>
+    <text x="1120" y="163" text-anchor="middle" font-size="14" font-weight="bold" fill="white">k8s-worker-02 (192.168.68.83)</text>
     
-    <!-- Additional Services -->
-    <text x="970" y="205" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Additional Replicas</text>
+    <!-- More Microservices -->
+    <text x="1120" y="195" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Additional Services</text>
     
-    <rect x="820" y="220" width="140" height="50" fill="#ff6b6b" stroke="#c92a2a" stroke-width="1" rx="3"/>
-    <text x="890" y="240" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Frontend</text>
-    <text x="890" y="258" text-anchor="middle" font-size="9" fill="white">Replicas 4-6</text>
+    <g id="more-services">
+      <rect x="930" y="210" width="110" height="40" fill="#845ec2" stroke="#5f3dc4" rx="3"/>
+      <text x="985" y="230" text-anchor="middle" font-size="10" fill="white">Product Service</text>
+      <text x="985" y="243" text-anchor="middle" font-size="8" fill="white">httpbin (2 pods)</text>
+      
+      <rect x="1050" y="210" width="110" height="40" fill="#845ec2" stroke="#5f3dc4" rx="3"/>
+      <text x="1105" y="230" text-anchor="middle" font-size="10" fill="white">Order Service</text>
+      <text x="1105" y="243" text-anchor="middle" font-size="8" fill="white">nginx (2 pods)</text>
+      
+      <rect x="1170" y="210" width="140" height="40" fill="#845ec2" stroke="#5f3dc4" rx="3"/>
+      <text x="1240" y="230" text-anchor="middle" font-size="10" fill="white">Notification Service</text>
+      <text x="1240" y="243" text-anchor="middle" font-size="8" fill="white">httpbin (1 pod)</text>
+    </g>
     
-    <rect x="980" y="220" width="140" height="50" fill="#845ec2" stroke="#5f3dc4" stroke-width="1" rx="3"/>
-    <text x="1050" y="240" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Services</text>
-    <text x="1050" y="258" text-anchor="middle" font-size="9" fill="white">HA Replicas</text>
+    <!-- Monitoring Stack -->
+    <text x="1120" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Monitoring & Observability</text>
     
-    <!-- Observability -->
-    <text x="970" y="295" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Observability</text>
+    <g id="monitoring">
+      <rect x="930" y="285" width="90" height="40" fill="#ff9f1a" stroke="#e67700" rx="3"/>
+      <text x="975" y="305" text-anchor="middle" font-size="10" fill="white">Prometheus</text>
+      <text x="975" y="318" text-anchor="middle" font-size="8" fill="white">.201:9090</text>
+      
+      <rect x="1030" y="285" width="90" height="40" fill="#f46a54" stroke="#e94b35" rx="3"/>
+      <text x="1075" y="305" text-anchor="middle" font-size="10" fill="white">Grafana</text>
+      <text x="1075" y="318" text-anchor="middle" font-size="8" fill="white">.202:3000</text>
+      
+      <rect x="1130" y="285" width="90" height="40" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1175" y="305" text-anchor="middle" font-size="10" fill="white">AlertManager</text>
+      <text x="1175" y="318" text-anchor="middle" font-size="8" fill="white">.203:9093</text>
+      
+      <rect x="1230" y="285" width="80" height="40" fill="#00b4d8" stroke="#0077b6" rx="3"/>
+      <text x="1270" y="305" text-anchor="middle" font-size="10" fill="white">Loki</text>
+      <text x="1270" y="318" text-anchor="middle" font-size="8" fill="white">Logs</text>
+    </g>
     
-    <rect x="820" y="310" width="140" height="50" fill="#60a5fa" stroke="#3b82f6" stroke-width="1" rx="3"/>
-    <text x="890" y="330" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Jaeger</text>
-    <text x="890" y="348" text-anchor="middle" font-size="9" fill="white">Tracing</text>
+    <!-- GitOps -->
+    <rect x="930" y="335" width="380" height="40" fill="#00d4aa" stroke="#00a884" rx="3"/>
+    <text x="1120" y="355" text-anchor="middle" font-size="11" fill="white">ArgoCD GitOps Controller</text>
+    <text x="1120" y="368" text-anchor="middle" font-size="9" fill="white">192.168.68.204 | Automated Deployments</text>
     
-    <rect x="980" y="310" width="140" height="50" fill="#10b981" stroke="#059669" stroke-width="1" rx="3"/>
-    <text x="1050" y="330" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Metrics Server</text>
-    <text x="1050" y="348" text-anchor="middle" font-size="9" fill="white">Resource Metrics</text>
-    
-    <!-- Storage -->
-    <text x="970" y="385" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Storage System</text>
-    
-    <rect x="820" y="400" width="300" height="50" fill="#ffa94d" stroke="#fd7e14" stroke-width="1" rx="3"/>
-    <text x="970" y="420" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Longhorn Distributed Storage</text>
-    <text x="970" y="438" text-anchor="middle" font-size="9" fill="white">NVMe Optimized | 2 Replicas</text>
-    
-    <!-- Backup -->
-    <rect x="820" y="460" width="300" height="50" fill="#06b6d4" stroke="#0891b2" stroke-width="1" rx="3"/>
-    <text x="970" y="480" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Velero Backup</text>
-    <text x="970" y="498" text-anchor="middle" font-size="9" fill="white">Disaster Recovery</text>
-    
-    <!-- Test Workloads -->
-    <rect x="820" y="520" width="300" height="50" fill="#94a3b8" stroke="#64748b" stroke-width="1" rx="3"/>
-    <text x="970" y="540" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Test/Dev Workloads</text>
-    <text x="970" y="558" text-anchor="middle" font-size="9" fill="white">192.168.68.210+</text>
+    <!-- Node Resources -->
+    <rect x="930" y="385" width="380" height="75" fill="#ecf0f1" stroke="#95a5a6" rx="3"/>
+    <text x="1120" y="405" text-anchor="middle" font-size="11" font-weight="bold" fill="#2c3e50">Node Utilization</text>
+    <text x="960" y="425" font-size="10" fill="#2c3e50">CPU: ~45% (7.2/16 threads)</text>
+    <text x="960" y="440" font-size="10" fill="#2c3e50">Memory: ~40% (12.8/32GB)</text>
+    <text x="1130" y="425" font-size="10" fill="#2c3e50">Pods: 15 Running</text>
+    <text x="1130" y="440" font-size="10" fill="#2c3e50">Storage: 70GB Used</text>
   </g>
   
-  <!-- Storage Layer Box -->
-  <g id="storage-layer">
-    <rect x="440" y="590" width="700" height="80" fill="#fff4e6" stroke="#fd7e14" stroke-width="2" rx="5"/>
-    <text x="790" y="615" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Persistent Storage Layer (Longhorn)</text>
-    <text x="790" y="635" text-anchor="middle" font-size="10" fill="#7f8c8d">StorageClass: fast-nvme | Dynamic PV Provisioning</text>
-    <text x="790" y="652" text-anchor="middle" font-size="10" fill="#7f8c8d">PostgreSQL: 50Gi | Redis: 10Gi | Monitoring: 70Gi | Apps: As needed</text>
+  <!-- LoadBalancer Services Box -->
+  <g id="loadbalancer-services">
+    <rect x="70" y="500" width="1260" height="130" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2" rx="5"/>
+    <text x="700" y="525" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">MetalLB LoadBalancer Services</text>
+    
+    <!-- Service Grid -->
+    <g id="service-grid">
+      <!-- Row 1 -->
+      <rect x="90" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="160" y="558" text-anchor="middle" font-size="10" fill="white">NGINX Ingress (.200)</text>
+      
+      <rect x="240" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="310" y="558" text-anchor="middle" font-size="10" fill="white">Prometheus (.201)</text>
+      
+      <rect x="390" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="460" y="558" text-anchor="middle" font-size="10" fill="white">Grafana (.202)</text>
+      
+      <rect x="540" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="610" y="558" text-anchor="middle" font-size="10" fill="white">AlertManager (.203)</text>
+      
+      <rect x="690" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="760" y="558" text-anchor="middle" font-size="10" fill="white">ArgoCD (.204)</text>
+      
+      <rect x="840" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="910" y="558" text-anchor="middle" font-size="10" fill="white">RabbitMQ Mgmt (.205)</text>
+      
+      <rect x="990" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="1060" y="558" text-anchor="middle" font-size="10" fill="white">Longhorn UI (.206)</text>
+      
+      <rect x="1140" y="540" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+      <text x="1210" y="558" text-anchor="middle" font-size="10" fill="white">Frontend App (.210)</text>
+    </g>
+    
+    <!-- Row 2 -->
+    <rect x="90" y="580" width="140" height="30" fill="#339af0" stroke="#1c7ed6" rx="3"/>
+    <text x="160" y="598" text-anchor="middle" font-size="10" fill="white">API Gateway (.211)</text>
+    
+    <text x="700" y="605" text-anchor="middle" font-size="11" fill="#2c3e50">Pool: 192.168.68.200-250 | Protocol: L2 Advertisement</text>
   </g>
   
-  <!-- Network Info Box -->
-  <g id="network-info">
-    <rect x="80" y="620" width="340" height="120" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2" rx="5"/>
-    <text x="250" y="645" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">Network Configuration</text>
-    <text x="100" y="665" font-size="10" fill="#2c3e50">• Cluster Network: 192.168.68.0/24</text>
-    <text x="100" y="680" font-size="10" fill="#2c3e50">• Pod Network: 10.244.0.0/16 (Cilium CNI)</text>
-    <text x="100" y="695" font-size="10" fill="#2c3e50">• Service Network: 10.96.0.0/12</text>
-    <text x="100" y="710" font-size="10" fill="#2c3e50">• LoadBalancer Pool: 192.168.68.200-250</text>
-    <text x="100" y="725" font-size="10" fill="#2c3e50">• DNS: CoreDNS on 10.96.0.10</text>
+  <!-- Ingress Flow -->
+  <g id="ingress-flow">
+    <rect x="70" y="650" width="400" height="190" fill="#fff4e6" stroke="#fd7e14" stroke-width="2" rx="5"/>
+    <text x="270" y="675" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">Ingress Traffic Flow</text>
+    
+    <!-- Flow Diagram -->
+    <rect x="200" y="690" width="140" height="25" fill="#ff6b6b" rx="3"/>
+    <text x="270" y="707" text-anchor="middle" font-size="10" fill="white">External Traffic</text>
+    
+    <line x1="270" y1="715" x2="270" y2="730" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <rect x="200" y="730" width="140" height="25" fill="#339af0" rx="3"/>
+    <text x="270" y="747" text-anchor="middle" font-size="10" fill="white">MetalLB (.200)</text>
+    
+    <line x1="270" y1="755" x2="270" y2="770" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <rect x="200" y="770" width="140" height="25" fill="#4ecdc4" rx="3"/>
+    <text x="270" y="787" text-anchor="middle" font-size="10" fill="white">NGINX Ingress</text>
+    
+    <line x1="270" y1="795" x2="270" y2="810" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <rect x="200" y="810" width="140" height="25" fill="#845ec2" rx="3"/>
+    <text x="270" y="827" text-anchor="middle" font-size="10" fill="white">Services/Pods</text>
   </g>
   
-  <!-- MetalLB Pool -->
-  <g id="metallb">
-    <rect x="440" y="685" width="700" height="55" fill="#e8f8e8" stroke="#51cf66" stroke-width="2" rx="5"/>
-    <text x="790" y="705" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">MetalLB LoadBalancer IP Assignments</text>
-    <text x="520" y="725" font-size="9" fill="#2c3e50">.200: Ingress</text>
-    <text x="620" y="725" font-size="9" fill="#2c3e50">.201: Prometheus</text>
-    <text x="730" y="725" font-size="9" fill="#2c3e50">.202: Grafana</text>
-    <text x="830" y="725" font-size="9" fill="#2c3e50">.203: AlertManager</text>
-    <text x="950" y="725" font-size="9" fill="#2c3e50">.204: ArgoCD</text>
-    <text x="1040" y="725" font-size="9" fill="#2c3e50">.210+: Apps</text>
+  <!-- Storage Architecture -->
+  <g id="storage-arch">
+    <rect x="490" y="650" width="400" height="190" fill="#e8f8e8" stroke="#51cf66" stroke-width="2" rx="5"/>
+    <text x="690" y="675" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">Storage Architecture</text>
+    
+    <rect x="510" y="690" width="360" height="35" fill="#ffa94d" stroke="#fd7e14" rx="3"/>
+    <text x="690" y="712" text-anchor="middle" font-size="11" fill="#2c3e50">Longhorn Distributed Storage</text>
+    
+    <text x="530" y="740" font-size="10" fill="#2c3e50">• StorageClass: fast-nvme (default)</text>
+    <text x="530" y="755" font-size="10" fill="#2c3e50">• Replication Factor: 2</text>
+    <text x="530" y="770" font-size="10" fill="#2c3e50">• Data Locality: best-effort</text>
+    <text x="530" y="785" font-size="10" fill="#2c3e50">• Backup: Velero integration</text>
+    
+    <text x="530" y="810" font-size="10" font-weight="bold" fill="#2c3e50">Persistent Volumes:</text>
+    <text x="530" y="825" font-size="9" fill="#2c3e50">PostgreSQL: 20Gi | Redis: 10Gi | RabbitMQ: 5Gi</text>
   </g>
+  
+  <!-- Security Policies -->
+  <g id="security">
+    <rect x="910" y="650" width="420" height="190" fill="#ffe8e8" stroke="#ff6b6b" stroke-width="2" rx="5"/>
+    <text x="1120" y="675" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">Security & Governance</text>
+    
+    <g id="security-items">
+      <rect x="930" y="690" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1020" y="707" text-anchor="middle" font-size="10" fill="white">RBAC Policies</text>
+      
+      <rect x="1130" y="690" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1220" y="707" text-anchor="middle" font-size="10" fill="white">Network Policies</text>
+      
+      <rect x="930" y="725" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1020" y="742" text-anchor="middle" font-size="10" fill="white">Pod Security Standards</text>
+      
+      <rect x="1130" y="725" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1220" y="742" text-anchor="middle" font-size="10" fill="white">Secrets Encryption</text>
+      
+      <rect x="930" y="760" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1020" y="777" text-anchor="middle" font-size="10" fill="white">Service Accounts</text>
+      
+      <rect x="1130" y="760" width="180" height="25" fill="#ff6b6b" stroke="#c92a2a" rx="3"/>
+      <text x="1220" y="777" text-anchor="middle" font-size="10" fill="white">TLS Certificates</text>
+    </g>
+    
+    <text x="1120" y="810" text-anchor="middle" font-size="10" fill="#2c3e50">Namespace Isolation | Resource Quotas | Audit Logging</text>
+    <text x="1120" y="825" text-anchor="middle" font-size="10" fill="#2c3e50">Image Scanning | Admission Controllers | OPA Policies</text>
+  </g>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2c3e50"/>
+    </marker>
+  </defs>
 </svg>
