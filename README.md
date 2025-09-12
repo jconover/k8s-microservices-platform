@@ -33,39 +33,55 @@ A production-ready Kubernetes platform demonstrating microservices architecture,
 
 ### Application Architecture
 
+```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Internet Traffic                         │
 └────────────────────┬────────────────────────────────────────────┘
-│
-┌──────▼──────┐
-│ NGINX       │ ◄── 192.168.68.200
-│ Ingress     │
-└──────┬──────┘
-│
-┌──────▼──────┐
-│ API Gateway │ ◄── 192.168.68.211
-│  (Traefik)  │
-└──────┬──────┘
-│
-┌───────────────┼───────────────┐
-│               │               │
-┌────▼────┐    ┌────▼────┐    ┌────▼────┐
-│Frontend │    │  User   │    │Product  │
-│(React)  │    │Service  │    │Service  │
-│3 replicas│   │Node.js  │    │Python   │
-└─────────┘    └────┬────┘    └────┬────┘
-│               │
-┌─────▼───────────────▼─────┐
-│      PostgreSQL           │
-│      Redis Cache          │
-│      RabbitMQ Queue       │
-└───────────────────────────┘
+                     │
+┌────────────────────▼────────────────────┐
+│ NGINX Ingress Controller                │ ◄── 192.168.68.200
+│ (Load Balancer + SSL Termination)       │
+└────────────────────┬────────────────────┘
+                     │
+┌────────────────────▼────────────────────┐
+│ API Gateway (NGINX)                     │ ◄── 192.168.68.211
+│ (Routing + Rate Limiting)               │
+└────────┬───────┬───────┬───────┬────────┘
+         │       │       │       │
+         ▼       ▼       ▼       ▼
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│   Frontend  │ │ User Service│ │Product Svc  │ │ Order Svc   │
+│   (React)   │ │  (Node.js)  │ │  (Python)   │ │   (Java)    │
+│  3 replicas │ │  2 replicas │ │  2 replicas │ │  2 replicas │
+│    :3000    │ │    :3000    │ │    :5000    │ │    :8080    │
+└─────────────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
+                       │               │               │
+                       └───────────────┼───────────────┘
+                                       │
+                           ┌───────────▼───────────┐
+                           │  Notification Service │ ◄── Async Processing
+                           │      (Python)         │
+                           │     1 replica         │
+                           │       :5001           │
+                           └───────────┬───────────┘
+                                       │
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│                            Shared Data Layer                                │
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────────────┐ │
+│  │   PostgreSQL    │  │   Redis Cache   │  │         RabbitMQ            │ │
+│  │   (Primary DB)  │  │   (Sessions &   │  │    (Message Queue for       │ │
+│  │   StatefulSet   │  │    Caching)     │  │     Async Notifications)    │ │
+│  │     :5432       │  │     :6379       │  │         :5672               │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 
 ## ✨ Features
 
 ### Core Platform
-- ✅ **Multi-tier Microservices**: Frontend, API Gateway, 4 backend services
+- ✅ **Polyglot Microservices**: React Frontend, NGINX Gateway, Node.js/Python/Java services
 - ✅ **Production Databases**: PostgreSQL StatefulSet, Redis cache, RabbitMQ messaging
 - ✅ **Auto-scaling**: HPA for dynamic scaling based on CPU/memory
 - ✅ **Service Mesh Ready**: Prepared for Istio/Linkerd integration
