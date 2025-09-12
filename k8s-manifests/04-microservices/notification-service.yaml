@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: yourusername/notification-service:latest
+        image: jconover/notification-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5001

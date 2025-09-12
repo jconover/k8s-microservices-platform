@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: product-service
-        image: yourusername/product-service:latest
+        image: jconover/product-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000

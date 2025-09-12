@@ -8,7 +8,7 @@ frontend:
   enabled: true
   replicaCount: 3
   image:
-    repository: yourusername/frontend
+    repository: jconover/frontend
     tag: latest
     pullPolicy: IfNotPresent
   service:
@@ -41,7 +41,7 @@ userService:
   enabled: true
   replicaCount: 2
   image:
-    repository: yourusername/user-service
+    repository: jconover/user-service
     tag: latest
     pullPolicy: IfNotPresent
   service:
@@ -60,7 +60,7 @@ productService:
   enabled: true
   replicaCount: 2
   image:
-    repository: yourusername/product-service
+    repository: jconover/product-service
     tag: latest
     pullPolicy: IfNotPresent
   service:
@@ -79,7 +79,7 @@ orderService:
   enabled: true
   replicaCount: 2
   image:
-    repository: yourusername/order-service
+    repository: jconover/order-service
     tag: latest
     pullPolicy: IfNotPresent
   service:
@@ -98,7 +98,7 @@ notificationService:
   enabled: true
   replicaCount: 1
   image:
-    repository: yourusername/notification-service
+    repository: jconover/notification-service
     tag: latest
     pullPolicy: IfNotPresent
   service:
