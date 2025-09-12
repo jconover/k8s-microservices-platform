@@ -80,7 +80,64 @@ Verify nodes are ready:
 kubectl get nodes
 ```
 
-## Step 4: Deploy Core Services
+## Step 4: Build and Push Docker Images
+
+**⚠️ CRITICAL STEP**: Before deploying applications, you must build and push the Docker images.
+
+### Option 1: Use Your Own Docker Hub Account (Recommended)
+
+```bash
+# 1. Login to Docker Hub
+docker login
+
+# 2. Update image references to use your Docker Hub username
+# Edit the following files and replace 'jconover' with your username:
+# - k8s-manifests/04-microservices/*.yaml
+# - scripts/build-all-images.sh
+# - scripts/push-all-images.sh
+
+# 3. Build all images
+./scripts/build-all-images.sh
+
+# 4. Push all images to Docker Hub
+./scripts/push-all-images.sh
+
+# 5. Verify images are available
+./scripts/check-images-status.sh
+```
+
+### Option 2: Use Pre-built Images (For Testing Only)
+
+If you want to use the existing `jconover/*` images for testing:
+
+```bash
+# Check if images are available
+./scripts/check-images-status.sh
+
+# If images are missing, you can pull them manually
+docker pull jconover/frontend:latest
+docker pull jconover/user-service:latest
+docker pull jconover/product-service:latest
+docker pull jconover/order-service:latest
+docker pull jconover/notification-service:latest
+```
+
+### Troubleshooting Image Issues
+
+```bash
+# Check Docker daemon is running
+docker ps
+
+# Test Docker Hub connectivity
+docker search nginx
+
+# Build a single service if needed
+cd applications/frontend
+docker build -t yourusername/frontend:latest .
+docker push yourusername/frontend:latest
+```
+
+## Step 5: Deploy Core Services
 
 ```bash
 ./scripts/03-deploy-core-services.sh
@@ -91,18 +148,22 @@ This deploys:
 - ArgoCD for GitOps
 - Database services (PostgreSQL, Redis, RabbitMQ)
 
-## Step 5: Deploy Applications
+## Step 6: Deploy Applications
 
 ```bash
 ./scripts/04-deploy-applications.sh
 ```
 
 This deploys:
-- Frontend React application
-- API Gateway (NGINX)
-- Microservices (User, Product, Order, Notification)
+- **Database secrets** (automatically created)
+- **Database services** (PostgreSQL, Redis, RabbitMQ)
+- **Frontend React application**
+- **API Gateway** (NGINX)
+- **Microservices** (User, Product, Order, Notification)
 
-## Step 6: Verify Installation
+**Note**: The script automatically creates the required `db-secret` that the microservices need to connect to PostgreSQL.
+
+## Step 7: Verify Installation
 
 ```bash
 ./scripts/99-verify-cluster.sh

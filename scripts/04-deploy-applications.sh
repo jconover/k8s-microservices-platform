@@ -75,6 +75,10 @@ apply_manifests "$MANIFEST_DIR/02-networking" "metallb-system"
 # ===========================
 echo -e "\n${BLUE}=== Deploying Databases ===${NC}"
 
+# Apply database secrets first (CRITICAL for microservices)
+echo -e "${YELLOW}Creating database secrets...${NC}"
+kubectl apply -f "$MANIFEST_DIR/03-databases/db-secret.yaml"
+
 # Check if PostgreSQL StatefulSet already exists
 if statefulset_exists postgresql database; then
     echo -e "${YELLOW}PostgreSQL StatefulSet already exists, skipping...${NC}"
@@ -100,10 +104,7 @@ kubectl wait --for=condition=ready pod -l app=rabbitmq -n database --timeout=120
 # ===========================
 echo -e "\n${BLUE}=== Deploying Microservices ===${NC}"
 
-# Apply secrets first
-kubectl apply -f "$MANIFEST_DIR/04-microservices/00-secrets.yaml" 2>/dev/null || true
-
-# Apply all microservice manifests
+# Apply all microservice manifests (secrets already created in database section)
 apply_manifests "$MANIFEST_DIR/04-microservices" "microservices"
 
 # Wait for key deployments

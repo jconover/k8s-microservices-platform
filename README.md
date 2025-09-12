@@ -144,6 +144,8 @@ A production-ready Kubernetes platform demonstrating microservices architecture,
 - 3 Ubuntu 24.04 machines (physical or VMs)
 - Network connectivity between nodes
 - Basic knowledge of Kubernetes and Linux
+- **Docker Hub account** for pushing container images
+- **Docker installed** and running on your machine
 
 ### Fast Track Installation
 
@@ -152,39 +154,50 @@ A production-ready Kubernetes platform demonstrating microservices architecture,
 git clone https://github.com/jconover/k8s-microservices-platform.git
 cd k8s-microservices-platform
 
-# 2. Update node configurations
+# 2. Check prerequisites and prepare Docker images
+./scripts/00-pre-deployment-checklist.sh
+
+# 3. Update Docker registry to use your Docker Hub username
+./scripts/update-docker-registry.sh
+
+# 4. Update node configurations
 # Edit scripts/00-update-hosts.sh with your IPs if different
 
-# 3. Run on ALL nodes
+# 5. Run on ALL nodes
 sudo ./scripts/00-update-hosts.sh
 sudo ./scripts/01-install-prerequisites-all-nodes.sh
 sudo reboot
 
-# 4. On control plane node (after reboot)
+# 6. On control plane node (after reboot)
 sudo kubeadm init \
   --apiserver-advertise-address=192.168.68.86 \
   --pod-network-cidr=10.244.0.0/16 \
   --upload-certs
 
-# 5. Configure kubectl (on control plane)
+# 7. Configure kubectl (on control plane)
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# 6. Install Cilium CNI (on control plane)
+# 8. Install Cilium CNI (on control plane)
 ./scripts/02-setup-master.sh
 
-# 7. Join worker nodes (copy command from step 4 output)
+# 9. Join worker nodes (copy command from step 6 output)
 # Run on each worker:
 sudo kubeadm join 192.168.68.86:6443 --token <token> --discovery-token-ca-cert-hash <hash>
 
-# 8. Deploy core services (on control plane)
+# 10. Build and push Docker images (REQUIRED)
+docker login
+./scripts/build-all-images.sh
+./scripts/push-all-images.sh
+
+# 11. Deploy core services (on control plane)
 ./scripts/03-deploy-core-services.sh
 
-# 9. Deploy applications
+# 12. Deploy applications
 ./scripts/04-deploy-applications.sh
 
-# 10. Verify deployment
+# 13. Verify deployment
 ./scripts/99-verify-cluster.sh
 ```
 

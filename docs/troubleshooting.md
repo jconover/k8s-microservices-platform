@@ -75,6 +75,43 @@ kubectl run debug --image=busybox -it --rm -- /bin/sh
 kubectl debug <pod-name> -it --image=busybox
 ```
 
+### Secret Issues
+
+#### Missing Database Secret
+```bash
+# Check if secrets exist
+kubectl get secrets -n microservices
+kubectl get secrets -n database
+
+# Common error: "secret db-secret not found"
+# Fix by applying the secret
+kubectl apply -f k8s-manifests/03-databases/db-secret.yaml
+
+# Or use the manual script
+./scripts/create-secrets.sh
+
+# Restart affected pods
+kubectl rollout restart deployment/order-service -n microservices
+kubectl rollout restart deployment/product-service -n microservices
+kubectl rollout restart deployment/user-service -n microservices
+
+# Verify pods start successfully
+kubectl get pods -n microservices
+```
+
+#### Secret Content Issues
+```bash
+# View secret content (base64 encoded)
+kubectl get secret db-secret -n microservices -o yaml
+
+# Decode secret value
+kubectl get secret db-secret -n microservices -o jsonpath="{.data.password}" | base64 -d
+
+# Update secret if password is wrong
+kubectl delete secret db-secret -n microservices
+kubectl create secret generic db-secret --from-literal=password="SuperSecurePassword123!" -n microservices
+```
+
 ### Storage Issues
 
 #### PVC Stuck in Pending
