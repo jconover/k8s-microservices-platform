@@ -23,6 +23,7 @@ A production-ready Kubernetes platform demonstrating microservices architecture,
 
 ### 📚 Documentation
 - [📖 Detailed Setup Guide](docs/setup-guide.md)
+- [🎯 Post-Deployment Guide](docs/post-deployment-guide.md)
 - [🔧 Troubleshooting Guide](docs/troubleshooting.md)
 - [📚 Quick Reference](docs/quick-reference.md)
 
@@ -185,6 +186,27 @@ sudo kubeadm join 192.168.68.86:6443 --token <token> --discovery-token-ca-cert-h
 
 # 10. Verify deployment
 ./scripts/99-verify-cluster.sh
+```
+
+## 🎯 What's Next?
+
+After deployment, follow the [Post-Deployment Guide](docs/post-deployment-guide.md) to:
+
+- ✅ **Verify all services** are running properly
+- ✅ **Test applications** and API endpoints  
+- ✅ **Access monitoring dashboards** (Grafana, Prometheus)
+- ✅ **Configure GitOps** with ArgoCD
+- ✅ **Set up alerts** and backup strategies
+- ✅ **Implement security** best practices
+
+**Quick verification:**
+```bash
+# Run comprehensive verification
+./scripts/verify-microservices.sh
+
+# Test your applications
+curl http://192.168.68.210          # Frontend
+curl http://192.168.68.211:8080/health  # API Gateway
 ```
 
 
